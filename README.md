@@ -57,5 +57,7 @@ the drawing color, and render your desired objects.
 
 ## Pin Connections
 This picture shows the pin connections using the RPi 40 pin header that is included on the
-2.13" device. I have used these pins in my own usage of the device.
+2.13" device.
 ![](https://github.com/markwomack/Arduino_EPaperDisplay/blob/main/RPiPinsForDisplay.jpg)
+
+I have used these pins in my own usage of the device.
