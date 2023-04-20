@@ -54,3 +54,8 @@ Elements are drawn in the current color (BLACK or WHITE) that is set on the Pain
 default is BLACK. If you want to draw in inverse (BLACK background, WHITE drawings), then
 use the eraseBuffer(BLACK) to fill the entire buffer with BLACK, use setColor(WHITE) to change
 the drawing color, and render your desired objects.
+
+## Pin Connections
+This picture shows the pin connections using the RPi 40 pin header that is included on the
+2.13" device. I have used these pins in my own usage of the device.
+![](https://github.com/markwomack/Arduino_EPaperDisplay/blob/main/RPiPinsForDisplay.jpg)
