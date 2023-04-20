@@ -33,7 +33,7 @@ this is doing or why one would use PART mode yet.
 below shows the origin for each orientation. ROTATE_90 means the display will be in 'landscape'
 mode (The default orientation is ROTATE_0).
 ![](https://github.com/markwomack/Arduino_EPaperDisplay/blob/main/2.13InchePaperDisplay.jpg)
-- Then a PaintBuffer object is retrieved from the EPaperDisplay. This PaintBuffer is what is
+- A PaintBuffer object is retrieved from the EPaperDisplay. This PaintBuffer is what is
 used to render pixels into the display. You perform the drawing operations on the PaintBuffer
 instance. When finished drawing, call the refresh() method on the ePaperDisplay to display
 the current buffer.
