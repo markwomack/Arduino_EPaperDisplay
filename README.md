@@ -73,25 +73,20 @@ once again by another call to the start method.
 
 - **setMode** - The setMode method must be called before the refresh method is called. It
 'wakes' the display up from sleep mode and readys the display to receive data.
-
 - **refresh** - The refresh method is used to render the current contents of the underlying
 buffer to the display. If using a full size buffer (FULL_BUFFER), refresh only
 needs to be called once to render the buffer to the display. If a partial buffer is used,
 then 5 calls to refresh are required to render a full size buffer to the display. This is
 discussed more in the Demo Code section below.
-
 - **sleep** - After updating the display with the image data, you can call the sleep method
 to place the display into low power sleep mode. In this mode the display will draw a 
 very small amount of current, but the current image on the display will be maintained.
 Once in sleep mode, use the setMode method to 'wake up' the display for rendering.
-
 - **reset** - The reset method will perform a hardware reset of the display. This can be
 used if the display becomes unresponsive.
-
 - **getWidth** - This method returns the width of the display based on the current display
 orientation. If the orientation is ROTATE_0 or ROTATE_180, the width will be 122, and
 if the orientation is ROTATE_90 or ROTATE_270, the width will be 250.
-
 - **getHeight** - This method returns the height of the display based on the current display
 orientation. If the orientation is ROTATE_0 or ROTATE_180, the height will be 250, and
 if the orientation is ROTATE_90 or ROTATE_270, the height will be 122.
@@ -119,18 +114,47 @@ eraseBuffer(BLACK) to fill the entire buffer with black, and use setColor(WHITE)
 to change the drawing color, and render your desired objects.
 
 - **getColor** - Returns the current color set in the PaintBuffer.
+- **drawPixel** - Draws a pixel at the given point, in the current color.
+- **drawLine** - Draws a line between two given points, in the current color.
+- **drawRectangle** - Draws a rectangle between two given points, in the current color.
+- **drawFilledRectangle** - Draws a filled rectangle between to given points, in the current
+color.
+- **drawCircle** - Draws a circle centered on a given point with the given radious, in the
+current color.
+- **drawFilledCircle** - Draws a filledcircle centered on a given point with the given radious,
+in the current color.
+- **drawBitmap** - Draws a bitmap, located in normal memory, of a given width and height with
+the top left of the bitmap starting at a given point. Be default only the bits in the image
+that are set will be rendered in the current color (skipUnsetBits = true). But if skipUnsetBits
+parameter is set to false, then the set bits are rendered in the current color and the unset
+bits are rendered in the opposite color.
+- **drawBitmapFromProgMem** - Draws a bitmap, located in PROG_MEM, of a given width and height
+with the top left of the bitmap starting at a given point. Be default only the bits in the image
+that are set will be rendered in the current color (skipUnsetBits = true). But if skipUnsetBits
+parameter is set to false, then the set bits are rendered in the current color and the unset
+bits are rendered in the opposite color.
+- **drawStringAt** - Draws a given string, using one of the built-in fonts located in PROG_MEM,
+justified around a given point. If LEFT_JUSTIFIED, the default, the top/left of the string
+will start at the given point. If CENTER_JUSTIFIED, the string will render to the left of the
+point with the point being at the center/top of the rendered string. If RIGHT_JUSTIFIED, the
+top/right of the string will end at the given point.
+- **getWidth** - This method returns the width of the display based on the current display
+orientation and buffer type. If the buffer type is FULL_BUFFER and the orientation is
+ROTATE_0 or ROTATE_180, the width will be 122, and if the orientation is ROTATE_90 or
+ROTATE_270, the width will be 250. If the buffer type is PARTIAL_BUFFER, then the buffer
+is smaller, only 1/5th the size. If the orientation is ROTATE_0 or ROTATE_180, the width will
+be 122, and if the orientation is ROTATE_90 or ROTATE_270, the width will be 50.
+- **getHeight**- This method returns the height of the display based on the current display
+orientation and buffer type. If the buffer type is FULL_BUFFER and the orientation is
+ROTATE_0 or ROTATE_180, the height will be 250, and if the orientation is ROTATE_90 or
+ROTATE_270, the height will be 122. If the buffer type is PARTIAL_BUFFER, then the buffer
+is smaller, only 1/5th the size. If the orientation is ROTATE_0 or ROTATE_180, the width will
+be 50, and if the orientation is ROTATE_90 or ROTATE_270, the width will be 122.
+- **useOffsetStep** - If using a PARTIAL_BUFFER, and you still want the drawing to be rendered
+as if there is a full buffer, then set this value to true (the default is false). You will need
+to draw the full image multiple times, and this is discussed further in the Demo Code section
+below.
+- **setOffsetStep** - Do not use this method. It is called by the parent EParentDisplay to
+coordinate with the PaintBuffer when refreshing with a partial buffer.
 
-- **drawPixel**
-- **drawLine**
-- **drawRectangle**
-- **drawFilledRectangle**
-- **drawCircle**
-- **drawFilledCircle**
-- **drawBitmap**
-- **drawBitmapFromProgMem**
-- **drawStringAt**
-- **getWidth**
-- **getHeight**
-- **useOffsetStep**
-- **setOffsetStep**
-
+## Demo Code
