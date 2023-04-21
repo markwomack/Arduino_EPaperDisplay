@@ -32,7 +32,7 @@ this is doing or why one would use PART mode yet.
 - The setDisplayOrientation() is called to 'rotate' the origin of the display. The picture
 below shows the origin for each orientation. ROTATE_90 means the display will be in 'landscape'
 mode (The default orientation is ROTATE_0).
-![](https://github.com/markwomack/Arduino_EPaperDisplay/blob/main/2.13InchePaperDisplay.jpg)
+![](https://github.com/markwomack/Arduino_EPaperDisplay/blob/main/docs/2.13InchePaperDisplay.jpg)
 - A PaintBuffer object is retrieved from the EPaperDisplay. This PaintBuffer is what is
 used to render pixels into the display. You perform the drawing operations on the PaintBuffer
 instance. When finished drawing, call the refresh() method on the ePaperDisplay to display
@@ -58,6 +58,6 @@ the drawing color, and render your desired objects.
 ## Pin Connections
 This picture shows the pin connections using the RPi 40 pin header that is included on the
 2.13" device.
-![](https://github.com/markwomack/Arduino_EPaperDisplay/blob/main/RPiPinsForDisplay.jpg)
+![](https://github.com/markwomack/Arduino_EPaperDisplay/blob/main/docs/RPiPinsForDisplay.jpg)
 
 I have used these pins in my own usage of the device.
