@@ -6,16 +6,16 @@ This code is written specifically for this e-Paper display model from Waveshare:
 
 [2.13" Touch e-Paper HAT for Raspberry Pi, 250×122, Black / White, SPI](https://www.waveshare.com/product/displays/e-paper/epaper-3/2.13inch-touch-e-paper-hat.htm)
 
-While this display is very oriented for usage with a Raspberry Pi, it is still
+While this display is meant for usage with a Raspberry Pi, it is still
 compatible with Arduino. And in fact, Waveshare has Arduino example code to drive
-the display (but not the touch screen) here:
+the display (but not the touch screen) is located here:
 
 [epd2in13_V3](https://github.com/waveshare/e-Paper/tree/master/Arduino/epd2in13_V3)
 
-That Waveshare code is what I started with to create this version. Much of the structure
-and code is the same, just cleaned up with some better class organization. I don't have
-any documentation about the SPI commands, so I have just copied them over as-is. I will
-add more comments and documentation as I learn more.
+I started with that Waveshare code to create my code. Much of the structure
+and code is the same, just cleaned up with some better class organization and some added
+features. I don't have any documentation about the SPI commands, so I have just copied
+them over as-is. I will add more comments and documentation as I learn more.
 
 ## Licenses
 All of this code is released under the MIT license except where noted in any files. The
@@ -97,22 +97,40 @@ orientation. If the orientation is ROTATE_0 or ROTATE_180, the height will be 25
 if the orientation is ROTATE_90 or ROTATE_270, the height will be 122.
 
 #### Memory usage
-The current code allocates a full image buffer for the entire display. At 122 x 250 black or
-white pixels this amounts to 4000 bytes.
+The underlying buffer and PaintBuffer object are allocated with the call to the start method
+and deallocated with the call to stop method. Typical usage has just the call to the start
+method, so memory is not constantly allocated and deallocated. As mentioned above, by default
+the EPaperDisplay class will allocated a buffer to match the full size of the display, which
+is 122 x 250 black or white pixesl. It works out to 4000 bytes for the buffer.
 
 ### PaintBuffer
-The PaintBuffer class has basic methods to render lines, rectangles, circles, and bitmaps. It
-uses the same image buffer created by the EPaperDisplay instance, so memory is conserved.
+The PaintBuffer class has basic primitives to render points, lines, rectangles, circles, 
+strings, and bitmaps. It uses the same underlying buffer created by the EPaperDisplay instance,
+so memory is conserved. You get a reference to the paint buffer by calling the start method
+of the display.
 
-#### Color
-Elements are drawn in the current color (BLACK or WHITE) that is set on the PaintBuffer. The
-default is BLACK. If you want to draw in inverse (BLACK background, WHITE drawings), then
-use the eraseBuffer(BLACK) to fill the entire buffer with BLACK, use setColor(WHITE) to change
-the drawing color, and render your desired objects.
+- **eraseBuffer** - Use eraseBuffer to clear the entire buffer to the given color. By default
+this color is WHITE, but you can pass in BLACK as the value to set the entire buffer to black.
 
-## Pin Connections
-This picture shows the pin connections using the RPi 40 pin header that is included on the
-2.13" device.
-![](https://github.com/markwomack/Arduino_EPaperDisplay/blob/main/docs/RPiPinsForDisplay.jpg)
+- **setColor** - Use the setColor method to set the color that elements will be drawn in. By
+default this color is BLACK, but you can set the color to WHITE if drawing on a black
+background. You can draw in inverse (BLACK background, WHITE drawings), then use the
+eraseBuffer(BLACK) to fill the entire buffer with black, and use setColor(WHITE)
+to change the drawing color, and render your desired objects.
 
-I have used these pins in my own usage of the device.
+- **getColor** - Returns the current color set in the PaintBuffer.
+
+- **drawPixel**
+- **drawLine**
+- **drawRectangle**
+- **drawFilledRectangle**
+- **drawCircle**
+- **drawFilledCircle**
+- **drawBitmap**
+- **drawBitmapFromProgMem**
+- **drawStringAt**
+- **getWidth**
+- **getHeight**
+- **useOffsetStep**
+- **setOffsetStep**
+
