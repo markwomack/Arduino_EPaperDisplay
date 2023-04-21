@@ -5,8 +5,6 @@
 
 #include <Arduino.h>
 
-#include <DebugMsgs.h>
-
 #include "EPaperDisplay.h"
 
 const uint8_t lut_full_update[]= {
@@ -56,34 +54,62 @@ const uint8_t lut_partial_update[]= {
 // Display resolution in pixels
 const uint16_t DISPLAY_WIDTH(122);
 const uint16_t DISPLAY_HEIGHT(250);
+const uint16_t NUM_PARTIAL_BUFFER(5);
 
 EPaperDisplay::EPaperDisplay() {
-  _byteWidth = (DISPLAY_WIDTH % 8 == 0) ? (DISPLAY_WIDTH / 8 ) : (DISPLAY_WIDTH / 8 + 1);
-  _displayWidth = DISPLAY_WIDTH;
-  _displayHeight = DISPLAY_HEIGHT;
-  _imageBuffer = new uint8_t[_byteWidth * _displayHeight];
-  _paintBuffer = new PaintBuffer(_imageBuffer, _displayWidth, _displayHeight, _byteWidth);
+  _imageBuffer = 0;
+  _paintBuffer = 0;
 }
 
-void EPaperDisplay::start(uint8_t resetPin, uint8_t busyPin, uint8_t dcPin, uint8_t csPin, SPIClass* spi) {
-  _resetPin = resetPin;
-  _busyPin = busyPin;
-  _dcPin = dcPin;
-  _csPin = csPin;
-  _spi = spi;
-  
-  pinMode(_resetPin, OUTPUT);
-  pinMode(_dcPin, OUTPUT);
-  pinMode(_csPin, OUTPUT); 
-  pinMode(_busyPin, INPUT);
-  
-  _spi->begin();
-  _spi->beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
+void EPaperDisplay::setPinsAndSPI(uint8_t resetPin, uint8_t busyPin, uint8_t dcPin, uint8_t csPin, SPIClass* spi) {
+  // You can only set before start is called
+  if (_paintBuffer == 0) {
+    _resetPin = resetPin;
+    _busyPin = busyPin;
+    _dcPin = dcPin;
+    _csPin = csPin;
+    _spi = spi;
 
-  DebugMsgs.print("_displayWidth: ").print(_displayWidth)
-    .print(", _displayHeight: ").print(_displayHeight)
-    .print(", _byteWidth: ").print(_byteWidth)
-    .print(", num image bytes: ").println(_byteWidth * _displayHeight);
+    pinMode(_resetPin, OUTPUT);
+    pinMode(_dcPin, OUTPUT);
+    pinMode(_csPin, OUTPUT); 
+    pinMode(_busyPin, INPUT);
+  }
+}
+
+PaintBuffer* EPaperDisplay::start(BufferType bufferType) {
+  if (_paintBuffer == 0) {
+    _displayWidth = DISPLAY_WIDTH;
+    _displayHeight = DISPLAY_HEIGHT;
+    _bufferType = bufferType;
+    _partialRefreshCount = 0;
+    _bufferByteWidth = (DISPLAY_WIDTH % 8 == 0) ? (DISPLAY_WIDTH / 8 ) : (DISPLAY_WIDTH / 8 + 1);
+    _bufferWidth = DISPLAY_WIDTH;
+    if (_bufferType == PARTIAL_BUFFER) {
+      _bufferHeight = DISPLAY_HEIGHT / NUM_PARTIAL_BUFFER;
+    } else {
+      _bufferHeight = DISPLAY_HEIGHT;
+    }  
+    _imageBuffer = new uint8_t[_bufferByteWidth * _bufferHeight];
+    _paintBuffer = new PaintBuffer(_imageBuffer, _bufferWidth, _bufferHeight, _bufferByteWidth,
+      _bufferType == PARTIAL_BUFFER ? NUM_PARTIAL_BUFFER : 0, _displayRotation);
+    
+    _spi->begin();
+    _spi->beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
+  }
+  return _paintBuffer;
+}
+
+void EPaperDisplay::stop() {
+  if (_paintBuffer != 0) {
+  _spi->endTransaction();
+    _spi->end();
+  
+    free(_imageBuffer);
+    free(_paintBuffer);
+    _imageBuffer = 0;
+    _paintBuffer = 0;
+  }
 }
 
 void EPaperDisplay::setMode(Mode mode) {
@@ -177,34 +203,72 @@ void EPaperDisplay::setCursor(uint8_t xStart, uint8_t yStart) {
   sendData((yStart >> 8) & 0xFF);
 }
 
-PaintBuffer* EPaperDisplay::getPaintBuffer() {
-  return _paintBuffer;
-}
-
-void EPaperDisplay::refresh() {
-
-  sendCommand(0x24);
-  
-//  for(int i = 0; i < _byteWidth * _displayHeight; i++){
-//    sendData(_imageBuffer[i]);
-//  }
-  for (int j = 0; j < _displayHeight; j++) {
-    for (int i = 0; i < _byteWidth; i++) {
-      sendData(_imageBuffer[i + j * _byteWidth]);
+uint16_t EPaperDisplay::getDisplayWidth() {
+  switch(_displayRotation) {
+    case ROTATE_90:
+    case ROTATE_270: {
+      return _displayHeight;
+    }
+    
+    default: { // ROTATE_0, ROTATE_180
+      return _displayWidth;
     }
   }
+}
 
-  // refresh display
-  sendCommand(0x22);
-  sendData(0xC7);
-  sendCommand(0x20);
-  waitUntilIdle();
+uint16_t EPaperDisplay::getDisplayHeight() {
+  switch(_displayRotation) {
+    case ROTATE_90:
+    case ROTATE_270: {
+      return _displayWidth;
+    }
+    
+    default: { // ROTATE_0, ROTATE_180
+      return _displayHeight;
+    }
+  }
+}
+
+void EPaperDisplay::setDisplayRotation(DisplayRotation displayRotation) {
+  // You can only change display rotation before start() is called
+  if (_paintBuffer == 0) {
+    _displayRotation = displayRotation;
+  }
+}
+
+    
+void EPaperDisplay::refresh() {
+  if (_bufferType == FULL_BUFFER || (_bufferType == PARTIAL_BUFFER && _partialRefreshCount == 0)) {
+    sendCommand(0x24);
+  }
+  
+  for (int i = 0; i < _bufferByteWidth * _bufferHeight; i++){
+    sendData(_imageBuffer[i]);
+  }
+//  for (int j = 0; j < _bufferHeight; j++) {
+//    for (int i = 0; i < _bufferByteWidth; i++) {
+//      sendData(_imageBuffer[i + j * _bufferByteWidth]);
+//    }
+//  }
+
+  _partialRefreshCount++;
+
+  if (_bufferType == FULL_BUFFER || (_bufferType == PARTIAL_BUFFER && _partialRefreshCount == NUM_PARTIAL_BUFFER)) {
+    // refresh display
+    sendCommand(0x22);
+    sendData(0xC7);
+    sendCommand(0x20);
+    waitUntilIdle();
+    _partialRefreshCount = 0;
+  }
+  
+  _paintBuffer->setOffsetStep(_partialRefreshCount);
 }
 
 void EPaperDisplay::clear() {
   sendCommand(0x24);
   for (int j = 0; j < _displayHeight; j++) {
-    for (int i = 0; i < _byteWidth; i++) {
+    for (int i = 0; i < _bufferByteWidth; i++) {
       sendData(0xFF);
     }
   }

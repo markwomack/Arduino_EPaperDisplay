@@ -5,19 +5,20 @@
 
 #include <Arduino.h>
 
-#include <DebugMsgs.h>
-
 #include "PaintBuffer.h"
 
-
-PaintBuffer::PaintBuffer(uint8_t* buffer, uint16_t displayWidth, uint16_t displayHeight, uint16_t byteWidth) {
+PaintBuffer::PaintBuffer(uint8_t* buffer, uint16_t displayWidth, uint16_t displayHeight,
+    uint16_t byteWidth, uint8_t numOffsetSteps, DisplayRotation displayRotation) {
   _buffer = buffer;
   _width = displayWidth;
   _height = displayHeight;
   _byteWidth = byteWidth;
   _bitWidth = byteWidth * 8;
   _color = BLACK;
-  _bufferRotation = ROTATE_0;
+  _displayRotation = displayRotation;
+  _useOffsetStep = false;
+  _offsetStep = 0;
+  _numOffsetSteps = numOffsetSteps;
 }
 
 void PaintBuffer::eraseBuffer(Color color) {
@@ -28,11 +29,29 @@ void PaintBuffer::eraseBuffer(Color color) {
 }
 
 uint16_t PaintBuffer::getWidth() {
-  return _width;
+  switch(_displayRotation) {
+    case ROTATE_90:
+    case ROTATE_270: {
+      return _height;
+    }
+    
+    default: { // ROTATE_0, ROTATE_180
+      return _width;
+    }
+  }
 }
 
 uint16_t PaintBuffer::getHeight() {
-  return _height;
+  switch(_displayRotation) {
+    case ROTATE_90:
+    case ROTATE_270: {
+      return _width;
+    }
+    
+    default: { // ROTATE_0, ROTATE_180
+      return _height;
+    }
+  }
 }
 
 Color PaintBuffer::getColor() {
@@ -43,8 +62,12 @@ void PaintBuffer::setColor(Color color) {
   _color = color;
 }
 
-void PaintBuffer::setBufferRotation(BufferRotation bufferRotation) {
-  _bufferRotation = bufferRotation;
+void PaintBuffer::useOffsetStep(bool useOffsetStep) {
+  _useOffsetStep = useOffsetStep;
+}
+
+void PaintBuffer::setOffsetStep(uint8_t step) {
+  _offsetStep = step;
 }
 
 void PaintBuffer::drawAbsolutePixel(uint16_t x, uint16_t y) {
@@ -53,7 +76,6 @@ void PaintBuffer::drawAbsolutePixel(uint16_t x, uint16_t y) {
 
 void PaintBuffer::drawAbsolutePixel(uint16_t x, uint16_t y, Color color) {
   if (x < 0 || x >= _width || y < 0 || y >= _height) {
-    DebugMsgs.debug().print("drawAbsolutePixel: Invalid pixel, x: ").print(x).print(", y: ").println(y);
     return;
   }
   
@@ -70,11 +92,12 @@ void PaintBuffer::drawPixel(uint16_t x, uint16_t y) {
 
 void PaintBuffer::drawPixel(uint16_t x, uint16_t y, Color color) {
   int point_temp;
-  switch (_bufferRotation) {
+  switch (_displayRotation) {
     case ROTATE_0: {
+      if (_useOffsetStep) {
+        y = y - (getHeight() * _offsetStep);
+      }
       if(x < 0 || x >= _width || y < 0 || y >= _height) {
-        DebugMsgs.debug().print("drawPixel ROTATE_0: Invalid pixel, x: ").print(x).print(", y: ").println(y)
-          .print(", x length: ").print(_width).print(", y length: ").println(_height);
         return;
       }
       
@@ -83,9 +106,10 @@ void PaintBuffer::drawPixel(uint16_t x, uint16_t y, Color color) {
     break;
 
     case ROTATE_90: {
+      if (_useOffsetStep) {
+        x = x - (getWidth() * _offsetStep);
+      }
       if(x < 0 || x >= _height || y < 0 || y >= _width) {
-        DebugMsgs.debug().print("drawPixel ROTATE_90: Invalid pixel, x: ").print(x).print(", y: ").print(y)
-          .print(", x length: ").print(_height).print(", y length: ").println(_width);
         return;
       }
       
@@ -97,9 +121,10 @@ void PaintBuffer::drawPixel(uint16_t x, uint16_t y, Color color) {
     break;
 
     case ROTATE_180: {
+      if (_useOffsetStep) {
+        y = y - (getHeight() * (_numOffsetSteps - _offsetStep - 1));
+      }
       if(x < 0 || x >= _width || y < 0 || y >= _height) {
-        DebugMsgs.debug().print("drawPixel ROTATE_180: Invalid pixel, x: ").print(x).print(", y: ").println(y)
-          .print(", x length: ").print(_width).print(", y length: ").println(_height);
         return;
       }
       x = _width - x - 1;
@@ -109,9 +134,10 @@ void PaintBuffer::drawPixel(uint16_t x, uint16_t y, Color color) {
     break;
 
     case ROTATE_270: {
+      if (_useOffsetStep) {
+        x = x - (getWidth() * (_numOffsetSteps - _offsetStep - 1));
+      }
       if(x < 0 || x >= _height || y < 0 || y >= _width) {
-        DebugMsgs.debug().print("drawPixel ROTATE_270: Invalid pixel, x: ").print(x).print(", y: ").println(y)
-          .print(", x length: ").print(_height).print(", y length: ").println(_width);
         return;
       }
       point_temp = x;
@@ -122,14 +148,6 @@ void PaintBuffer::drawPixel(uint16_t x, uint16_t y, Color color) {
     break;
   }
 }
-
-//void PaintBuffer::drawCharAt(uint16_t x, uint16_t y, char ascii_char, sFONT* font) {
-//
-//}
-
-//void PaintBuffer::drawStringAt(uint16_t x, uint16_t y, const char* text, sFONT* font) {
-//
-//}
 
 void PaintBuffer::drawLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
   // Check for easy cases
@@ -255,8 +273,6 @@ void PaintBuffer::drawFilledCircle(uint16_t x, uint16_t y, uint16_t radius) {
 
 void PaintBuffer::drawBitmap(const uint8_t* image, uint16_t x, uint16_t y,
     uint16_t width, uint16_t height, bool skipUnsetBits) {
-  // This may not be the most efficient code, but it will account for the
-  // display orientation by using drawPixel.
 
   int i, j;
 
@@ -280,8 +296,6 @@ void PaintBuffer::drawBitmap(const uint8_t* image, uint16_t x, uint16_t y,
 
 void PaintBuffer::drawBitmapFromProgMem(const uint8_t* image, uint16_t x, uint16_t y,
     uint16_t width, uint16_t height, bool skipUnsetBits) {
-  // This may not be the most efficient code, but it will account for the
-  // display orientation by using drawPixel.
 
   int i, j;
   for (j = 0; j < height; j++) {
@@ -333,6 +347,7 @@ void PaintBuffer::drawStringAt(uint16_t x, uint16_t y, const char* text, sFONT* 
 
     /* Decrement the column position by 16 */
     refColumn += font->width;
+    
     /* Point on the next character */
     p_text++;
   }
