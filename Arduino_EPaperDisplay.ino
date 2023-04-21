@@ -18,7 +18,7 @@ void fullBufferDemo() {
   EPaperDisplay display;
 
   display.setPinsAndSPI(RESET_PIN, BUSY_PIN, DC_PIN, SPI_CS0_PIN, &SPI);
-  display.setDisplayRotation(ROTATE_90);
+  display.setDisplayOrientation(ROTATE_90);
   PaintBuffer* paintBuffer = display.start();
   display.setMode(FULL);
   
@@ -65,7 +65,7 @@ void fullBufferDemo() {
   // would set a rotation and use it forever after. But the
   // demo is showing different usages.
   display.stop();
-  display.setDisplayRotation(ROTATE_0);
+  display.setDisplayOrientation(ROTATE_0);
   paintBuffer = display.start();
   
   paintBuffer->eraseBuffer();
@@ -82,7 +82,7 @@ void fullBufferDemo() {
   display.setMode(FULL);
   
   display.stop();
-  display.setDisplayRotation(ROTATE_90);
+  display.setDisplayOrientation(ROTATE_90);
   paintBuffer = display.start();
   paintBuffer->eraseBuffer();
   paintBuffer->drawBitmap(sample_image2, 0, 0, 21, 21);
@@ -97,7 +97,7 @@ void fullBufferDemo() {
   display.setMode(FULL);
 
   display.stop();
-  display.setDisplayRotation(ROTATE_180);
+  display.setDisplayOrientation(ROTATE_180);
   paintBuffer = display.start();
   paintBuffer->eraseBuffer();
   paintBuffer->drawBitmap(sample_image2, 0, 0, 21, 21);
@@ -112,7 +112,7 @@ void fullBufferDemo() {
   display.setMode(FULL);
 
   display.stop();
-  display.setDisplayRotation(ROTATE_270);
+  display.setDisplayOrientation(ROTATE_270);
   paintBuffer = display.start();
   paintBuffer->eraseBuffer();
   paintBuffer->drawBitmap(sample_image2, 0, 0, 21, 21);
@@ -127,7 +127,7 @@ void fullBufferDemo() {
   display.setMode(FULL);
 
   display.stop();
-  display.setDisplayRotation(ROTATE_90);
+  display.setDisplayOrientation(ROTATE_90);
   paintBuffer = display.start();
   paintBuffer->eraseBuffer();
   paintBuffer->drawStringAt(20, 2, "e-Paper Demo", &Font16, LEFT_JUST);
@@ -141,7 +141,7 @@ void fullBufferDemo() {
   display.setMode(FULL);
 
   display.stop();
-  display.setDisplayRotation(ROTATE_0);
+  display.setDisplayOrientation(ROTATE_0);
   paintBuffer = display.start();
   paintBuffer->eraseBuffer();
   paintBuffer->drawBitmapFromProgMem(sample_image3, 0, 0, 121, 249);
@@ -167,7 +167,7 @@ void partialBufferDemo() {
   EPaperDisplay display;
 
   display.setPinsAndSPI(RESET_PIN, BUSY_PIN, DC_PIN, SPI_CS0_PIN, &SPI);
-  display.setDisplayRotation(ROTATE_0);
+  display.setDisplayOrientation(ROTATE_0);
   PaintBuffer* paintBuffer = display.start(PARTIAL_BUFFER);
   display.setMode(FULL);
 
@@ -233,7 +233,7 @@ void partialBufferDemo() {
   // If you rotate the buffer while using a partial
   // buffer, then it doesn't work like you might expect
   display.stop();
-  display.setDisplayRotation(ROTATE_90);
+  display.setDisplayOrientation(ROTATE_90);
   paintBuffer = display.start(PARTIAL_BUFFER);
   display.setMode(FULL);
 
@@ -281,7 +281,7 @@ void partialBufferDemo() {
   // you draw everything in display coordinates
   // instead of the buffer coordinates.
   display.stop();
-  display.setDisplayRotation(ROTATE_0);
+  display.setDisplayOrientation(ROTATE_0);
   paintBuffer = display.start(PARTIAL_BUFFER);
   display.setMode(FULL);
   paintBuffer->useOffsetStep(true);
@@ -298,7 +298,7 @@ void partialBufferDemo() {
   delay(2000);
   
   display.stop();
-  display.setDisplayRotation(ROTATE_90);
+  display.setDisplayOrientation(ROTATE_90);
   paintBuffer = display.start(PARTIAL_BUFFER);
   display.setMode(FULL);
   paintBuffer->useOffsetStep(true);
@@ -315,7 +315,7 @@ void partialBufferDemo() {
   delay(2000);
   
   display.stop();
-  display.setDisplayRotation(ROTATE_180);
+  display.setDisplayOrientation(ROTATE_180);
   paintBuffer = display.start(PARTIAL_BUFFER);
   display.setMode(FULL);
   paintBuffer->useOffsetStep(true);
@@ -332,7 +332,7 @@ void partialBufferDemo() {
   delay(2000);
   
   display.stop();
-  display.setDisplayRotation(ROTATE_270);
+  display.setDisplayOrientation(ROTATE_270);
   paintBuffer = display.start(PARTIAL_BUFFER);
   display.setMode(FULL);
   paintBuffer->useOffsetStep(true);
@@ -351,7 +351,7 @@ void partialBufferDemo() {
   // Even full size bitmaps can be rendered across the
   // buffer refreshes to get the whole image.
   display.stop();
-  display.setDisplayRotation(ROTATE_0);
+  display.setDisplayOrientation(ROTATE_0);
   paintBuffer = display.start(PARTIAL_BUFFER);
   display.setMode(FULL);
   paintBuffer->useOffsetStep(true);

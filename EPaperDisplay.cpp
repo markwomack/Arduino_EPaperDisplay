@@ -92,7 +92,7 @@ PaintBuffer* EPaperDisplay::start(BufferType bufferType) {
     }  
     _imageBuffer = new uint8_t[_bufferByteWidth * _bufferHeight];
     _paintBuffer = new PaintBuffer(_imageBuffer, _bufferWidth, _bufferHeight, _bufferByteWidth,
-      _bufferType == PARTIAL_BUFFER ? NUM_PARTIAL_BUFFER : 0, _displayRotation);
+      _bufferType == PARTIAL_BUFFER ? NUM_PARTIAL_BUFFER : 0, _displayOrientation);
     
     _spi->begin();
     _spi->beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
@@ -204,7 +204,7 @@ void EPaperDisplay::setCursor(uint8_t xStart, uint8_t yStart) {
 }
 
 uint16_t EPaperDisplay::getDisplayWidth() {
-  switch(_displayRotation) {
+  switch(_displayOrientation) {
     case ROTATE_90:
     case ROTATE_270: {
       return _displayHeight;
@@ -217,7 +217,7 @@ uint16_t EPaperDisplay::getDisplayWidth() {
 }
 
 uint16_t EPaperDisplay::getDisplayHeight() {
-  switch(_displayRotation) {
+  switch(_displayOrientation) {
     case ROTATE_90:
     case ROTATE_270: {
       return _displayWidth;
@@ -229,10 +229,10 @@ uint16_t EPaperDisplay::getDisplayHeight() {
   }
 }
 
-void EPaperDisplay::setDisplayRotation(DisplayRotation displayRotation) {
+void EPaperDisplay::setDisplayOrientation(DisplayOrientation displayRotation) {
   // You can only change display rotation before start() is called
   if (_paintBuffer == 0) {
-    _displayRotation = displayRotation;
+    _displayOrientation = displayRotation;
   }
 }
 

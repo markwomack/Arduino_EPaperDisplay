@@ -12,7 +12,7 @@
 
 // Effectively sets the origin of
 // the display. ROTATE_0 is default.
-enum DisplayRotation {
+enum DisplayOrientation {
  ROTATE_0,
  ROTATE_90,
  ROTATE_180,
@@ -34,7 +34,7 @@ enum TextJustification {
 
 class PaintBuffer {
   public:
-    PaintBuffer(uint8_t* buffer, uint16_t width, uint16_t height, uint16_t byteWidth, uint8_t numOffsetStteps, DisplayRotation displayRotation);
+    PaintBuffer(uint8_t* buffer, uint16_t width, uint16_t height, uint16_t byteWidth, uint8_t numOffsetStteps, DisplayOrientation displayOrientation);
 
     // Erases the entire content of the buffer with the given color.
     void eraseBuffer(Color color = WHITE);
@@ -118,7 +118,7 @@ class PaintBuffer {
     uint16_t _byteWidth;
     uint16_t _bitWidth;
     Color _color;
-    DisplayRotation _displayRotation;
+    DisplayOrientation _displayOrientation;
     bool _useOffsetStep;
     uint16_t _numOffsetSteps;
     uint16_t _offsetStep;

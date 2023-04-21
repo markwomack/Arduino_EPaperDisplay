@@ -8,14 +8,14 @@
 #include "PaintBuffer.h"
 
 PaintBuffer::PaintBuffer(uint8_t* buffer, uint16_t displayWidth, uint16_t displayHeight,
-    uint16_t byteWidth, uint8_t numOffsetSteps, DisplayRotation displayRotation) {
+    uint16_t byteWidth, uint8_t numOffsetSteps, DisplayOrientation displayOrientation) {
   _buffer = buffer;
   _width = displayWidth;
   _height = displayHeight;
   _byteWidth = byteWidth;
   _bitWidth = byteWidth * 8;
   _color = BLACK;
-  _displayRotation = displayRotation;
+  _displayOrientation = displayOrientation;
   _useOffsetStep = false;
   _offsetStep = 0;
   _numOffsetSteps = numOffsetSteps;
@@ -29,7 +29,7 @@ void PaintBuffer::eraseBuffer(Color color) {
 }
 
 uint16_t PaintBuffer::getWidth() {
-  switch(_displayRotation) {
+  switch(_displayOrientation) {
     case ROTATE_90:
     case ROTATE_270: {
       return _height;
@@ -42,7 +42,7 @@ uint16_t PaintBuffer::getWidth() {
 }
 
 uint16_t PaintBuffer::getHeight() {
-  switch(_displayRotation) {
+  switch(_displayOrientation) {
     case ROTATE_90:
     case ROTATE_270: {
       return _width;
@@ -92,7 +92,7 @@ void PaintBuffer::drawPixel(uint16_t x, uint16_t y) {
 
 void PaintBuffer::drawPixel(uint16_t x, uint16_t y, Color color) {
   int point_temp;
-  switch (_displayRotation) {
+  switch (_displayOrientation) {
     case ROTATE_0: {
       if (_useOffsetStep) {
         y = y - (getHeight() * _offsetStep);

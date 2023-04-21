@@ -28,7 +28,7 @@ class EPaperDisplay {
 
     // Set these before calling start(). Default display rotation is ROTATE_0.
     void setPinsAndSPI(uint8_t resetPin, uint8_t busyPin, uint8_t dcPin, uint8_t csPin, SPIClass* spi);
-    void setDisplayRotation(DisplayRotation displayRotation);
+    void setDisplayOrientation(DisplayOrientation DisplayOrientation);
 
     // Start the display. Default is with a full size buffer, but can also
     // be with a PARTIAL_BUFFER instead.
@@ -59,18 +59,18 @@ class EPaperDisplay {
     void setWindow(uint8_t xStart, uint8_t yStart, uint8_t xEnd, uint8_t yEnd);
     void setCursor(uint8_t xStart, uint8_t yStart);
 
-    // Returns the display width. Changing displayRotation
+    // Returns the display width. Changing DisplayOrientation
     // affects this value.
     uint16_t getDisplayWidth();
 
-    // Returns the display height. Changing displayRotation
+    // Returns the display height. Changing DisplayOrientation
     // affects this value.
     uint16_t getDisplayHeight();
     
   private:
     uint16_t _displayWidth;
     uint16_t _displayHeight;
-    DisplayRotation _displayRotation;
+    DisplayOrientation _displayOrientation;
     BufferType _bufferType;
     uint8_t _partialRefreshCount;
     uint16_t _bufferByteWidth;
