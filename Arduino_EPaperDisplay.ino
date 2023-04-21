@@ -11,7 +11,7 @@
 #include "EPaperDisplay.h"
 #include "PaintBuffer.h"
 
-#include "image_data.h"
+#include "src/image_data.h"
                                  
 EPaperDisplay display;
 
@@ -26,7 +26,7 @@ void setup() {
   SPI.setSCK(SPI_SCK0_PIN);
 
   display.start(RESET_PIN, BUSY_PIN, DC_PIN, SPI_CS0_PIN, &SPI);
-  display.setDisplayMode(FULL);
+  display.setMode(FULL);
 
   PaintBuffer* paintBuffer = display.getPaintBuffer();
   
@@ -47,7 +47,7 @@ void setup() {
   delay(2000);
 
   // Wake up! Let's draw some more!
-  display.setDisplayMode(FULL);
+  display.setMode(FULL);
   
   paintBuffer->setBufferRotation(ROTATE_90);
   paintBuffer->eraseBuffer(BLACK);
@@ -67,7 +67,7 @@ void setup() {
   delay(2000);
 
   // Wake up! Let's draw some more!
-  display.setDisplayMode(FULL);
+  display.setMode(FULL);
 
   paintBuffer->setBufferRotation(ROTATE_0);
   paintBuffer->eraseBuffer();
@@ -81,7 +81,7 @@ void setup() {
   delay(1000);
 
   // Wake up! Let's draw some more!
-  display.setDisplayMode(FULL);
+  display.setMode(FULL);
   
   paintBuffer->setBufferRotation(ROTATE_90);
   paintBuffer->eraseBuffer();
@@ -94,7 +94,7 @@ void setup() {
   delay(1000);
 
   // Wake up! Let's draw some more!
-  display.setDisplayMode(FULL);
+  display.setMode(FULL);
 
   paintBuffer->setBufferRotation(ROTATE_180);
   paintBuffer->eraseBuffer();
@@ -107,7 +107,7 @@ void setup() {
   delay(1000);
 
   // Wake up! Let's draw some more!
-  display.setDisplayMode(FULL);
+  display.setMode(FULL);
 
   paintBuffer->setBufferRotation(ROTATE_270);
   paintBuffer->eraseBuffer();
@@ -120,7 +120,7 @@ void setup() {
   delay(1000);
 
   // Wake up! Let's draw some more!
-  display.setDisplayMode(FULL);
+  display.setMode(FULL);
 
   paintBuffer->setBufferRotation(ROTATE_90);
   paintBuffer->eraseBuffer();
@@ -132,7 +132,7 @@ void setup() {
   delay(2000);
 
   // Wake up! Let's draw some more!
-  display.setDisplayMode(FULL);
+  display.setMode(FULL);
 
   paintBuffer->setBufferRotation(ROTATE_0);
   paintBuffer->eraseBuffer();
@@ -141,7 +141,7 @@ void setup() {
   display.sleep();
 
   // Wake up! Let's draw some more!
-  display.setDisplayMode(FULL);
+  display.setMode(FULL);
 
   paintBuffer->setBufferRotation(ROTATE_0);
   paintBuffer->eraseBuffer(BLACK);

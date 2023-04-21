@@ -8,7 +8,7 @@
 
 #include <inttypes.h>
 
-#include "fonts.h"
+#include "src/fonts.h"
 
 enum BufferRotation {
  ROTATE_0,

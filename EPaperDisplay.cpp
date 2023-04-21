@@ -86,7 +86,7 @@ void EPaperDisplay::start(uint8_t resetPin, uint8_t busyPin, uint8_t dcPin, uint
     .print(", num image bytes: ").println(_byteWidth * _displayHeight);
 }
 
-void EPaperDisplay::setDisplayMode(DisplayMode mode) {
+void EPaperDisplay::setMode(Mode mode) {
     
   reset();
   

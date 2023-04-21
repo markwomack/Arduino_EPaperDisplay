@@ -12,7 +12,7 @@
 
 #include "PaintBuffer.h"
 
-enum DisplayMode {
+enum Mode {
   FULL,
   PART
 };
@@ -26,7 +26,7 @@ class EPaperDisplay {
     void clear();
     void reset();
     void sleep();
-    void setDisplayMode(DisplayMode mode);
+    void setMode(Mode mode);
     void setWindow(uint8_t xStart, uint8_t yStart, uint8_t xEnd, uint8_t yEnd);
     void setCursor(uint8_t xStart, uint8_t yStart);
     PaintBuffer* getPaintBuffer();
