@@ -55,10 +55,6 @@ class EPaperDisplay {
     // different mode makes yet.
     void setMode(Mode mode);
 
-    // Not sure what these do yet.
-    void setWindow(uint8_t xStart, uint8_t yStart, uint8_t xEnd, uint8_t yEnd);
-    void setCursor(uint8_t xStart, uint8_t yStart);
-
     // Returns the display width. Changing DisplayOrientation
     // affects this value.
     uint16_t getDisplayWidth();
@@ -91,5 +87,9 @@ class EPaperDisplay {
     void sendData(uint8_t data);
     void waitUntilIdle();
     void spiTransfer(uint8_t data);
+
+    // Not sure what these do yet.
+    void setWindow(uint8_t xStart, uint8_t yStart, uint8_t xEnd, uint8_t yEnd);
+    void setCursor(uint8_t xStart, uint8_t yStart);
 };
 #endif // EPAPERDISPLAY_H

@@ -36,9 +36,6 @@ class PaintBuffer {
   public:
     PaintBuffer(uint8_t* buffer, uint16_t width, uint16_t height, uint16_t byteWidth, uint8_t numOffsetStteps, DisplayOrientation displayOrientation);
 
-    // Erases the entire content of the buffer with the given color.
-    void eraseBuffer(Color color = WHITE);
-
     // Returns the width of the buffer. Display rotation
     // affects this value.
     uint16_t getWidth();
@@ -62,6 +59,9 @@ class PaintBuffer {
     // during refreshes. You should never need to call
     // it.
     void setOffsetStep(uint8_t step);
+
+    // Erases the entire content of the buffer with the given color.
+    void eraseBuffer(Color color = WHITE);
 
     // Draws a single pixel at the given location in the
     // current color.
