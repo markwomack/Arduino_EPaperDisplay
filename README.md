@@ -17,29 +17,84 @@ and code is the same, just cleaned up with some better class organization. I don
 any documentation about the SPI commands, so I have just copied them over as-is. I will
 add more comments and documentation as I learn more.
 
-## Classes
+## Licenses
+All of this code is released under the MIT license except where noted in any files. The
+original Waveshare code that was heavily used as a working example for this code had
+it's own permissive license, which is noted in the file LICENSE-Waveshare. The fonts
+used in this demo come from STMicroelectronics, and were originally included in the
+Waveshare demo code. They have their own permissive license included in those files.
+
+## Usage
 
 ### EPaperDisplay
-This is the main class that interfaces with the e-Paper device. See the comments in
-the EPaperDisplay.h file for an overview of the methods. The Arduino_EPaperDisplay sketch
-demonstrates basic usage, but a short overview:
+EPaperDisplay is the class that defines the features and functions of the display. You will
+typically create an instance at the start of the program, configure it for usage, and then
+start the display for rendering.
 
-- The EPaperDisplay object is created. Right now it is hardcoded to 122 x 250 pixels provided
-by the 2.13" display.
-- The start() method is called to setup the pins and SPI bus.
-- The setDisplayMode() is called to set the display for FULL mode. I don't exactly know what
-this is doing or why one would use PART mode yet.
-- The setDisplayOrientation() is called to 'rotate' the origin of the display. The picture
-below shows the origin for each orientation. ROTATE_90 means the display will be in 'landscape'
-mode (The default orientation is ROTATE_0).
+#### Configuration
+There are two main methods used to configure the display before usage. Typically you will
+call these methods once before calling the start method.
+
+- **setPinsAndSPI** - This method is called to configure the physical pins that the display
+is connected to on the microcontroller (Arduino). The display uses the SPI protocol to
+receive commands and data. The connections on the physical display are made either to
+the solder points on the display or through the 40 pin Raspberry Pi header. The Pi
+connections are documented in the picture below.
+
+![](https://github.com/markwomack/Arduino_EPaperDisplay/blob/main/docs/RPiPinsForDisplay.jpg)
+
+- **setDisplayOrientation** - This method sets the orientation of the display, effectively
+where the origin of the screen is when rendering. Once the display has been started, the
+orientation cannot be changed. The default orientation is ROTATE_0, so if that matches
+your usage, then no call is necessary. The picture below shows the origins of each
+orientation.
+
 ![](https://github.com/markwomack/Arduino_EPaperDisplay/blob/main/docs/2.13InchePaperDisplay.jpg)
-- A PaintBuffer object is retrieved from the EPaperDisplay. This PaintBuffer is what is
-used to render pixels into the display. You perform the drawing operations on the PaintBuffer
-instance. When finished drawing, call the refresh() method on the ePaperDisplay to display
-the current buffer.
 
-That's basically it. Use the PaintBuffer to render into the buffer, call EPaperDisplay refresh()
-to display the buffer. In between you can call sleep() so that the display uses much less power.
+#### Using the Display
+
+- **start** - The start method is called to initialize the display for usage. It returns a
+PaintBuffer instance, which is used to render pixels, lines, rectangles, circles, fonts,
+and bitmaps into the buffer for the display. More information on that class is below.
+By default the display is created with an underlying buffer that is the full size of the
+screen (FULL_BUFFER). For a black and white image at 122 x 250 pixels this is 4000 bytes.
+If that is too much for your available runtime memory, you can pass the value
+PARTIAL_BUFFER as a parameter to the start method and a smaller buffer will be created.
+However, this has implications for rendering, which is discussed further in the Demo Code
+section below. Typically you only need to call this method once, at the start of the program,
+using a full size buffer.
+
+- **stop** - The stop method is called to stop the display and release all of the memory
+associated with it, this includes the underlying buffer and the associated PaintBuffer
+object. After calling stop, the PaintBuffer instance returned from the call to the start
+method should be discarded (it's already been freed in stop). Typically the stop method
+is never called, but if there is a project that requires it, the display can be restarted
+once again by another call to the start method.
+
+- **setMode** - The setMode method must be called before the refresh method is called. It
+'wakes' the display up from sleep mode and readys the display to receive data.
+
+- **refresh** - The refresh method is used to render the current contents of the underlying
+buffer to the display. If using a full size buffer (FULL_BUFFER), refresh only
+needs to be called once to render the buffer to the display. If a partial buffer is used,
+then 5 calls to refresh are required to render a full size buffer to the display. This is
+discussed more in the Demo Code section below.
+
+- **sleep** - After updating the display with the image data, you can call the sleep method
+to place the display into low power sleep mode. In this mode the display will draw a 
+very small amount of current, but the current image on the display will be maintained.
+Once in sleep mode, use the setMode method to 'wake up' the display for rendering.
+
+- **reset** - The reset method will perform a hardware reset of the display. This can be
+used if the display becomes unresponsive.
+
+- **getWidth** - This method returns the width of the display based on the current display
+orientation. If the orientation is ROTATE_0 or ROTATE_180, the width will be 122, and
+if the orientation is ROTATE_90 or ROTATE_270, the width will be 250.
+
+- **getHeight** - This method returns the height of the display based on the current display
+orientation. If the orientation is ROTATE_0 or ROTATE_180, the height will be 250, and
+if the orientation is ROTATE_90 or ROTATE_270, the height will be 122.
 
 #### Memory usage
 The current code allocates a full image buffer for the entire display. At 122 x 250 black or
