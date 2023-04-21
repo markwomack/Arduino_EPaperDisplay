@@ -10,8 +10,12 @@
 #include <SPI.h>
 #include <inttypes.h>
 
-#include "display_constants.h"
 #include "PaintBuffer.h"
+
+enum DisplayMode {
+  FULL,
+  PART
+};
 
 class EPaperDisplay {
   public:
@@ -23,7 +27,6 @@ class EPaperDisplay {
     void reset();
     void sleep();
     void setDisplayMode(DisplayMode mode);
-    void setDisplayRotation(DisplayRotation displayRotation);
     void setWindow(uint8_t xStart, uint8_t yStart, uint8_t xEnd, uint8_t yEnd);
     void setCursor(uint8_t xStart, uint8_t yStart);
     PaintBuffer* getPaintBuffer();
@@ -32,7 +35,6 @@ class EPaperDisplay {
     uint16_t _displayWidth;
     uint16_t _displayHeight;
     uint16_t _byteWidth;
-    DisplayRotation _displayRotation;
     uint8_t* _imageBuffer;
     PaintBuffer* _paintBuffer;
    

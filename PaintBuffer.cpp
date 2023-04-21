@@ -10,22 +10,17 @@
 #include "PaintBuffer.h"
 
 
-PaintBuffer::PaintBuffer(uint8_t* buffer, uint16_t displayWidth, uint16_t displayHeight, 
-    uint16_t byteWidth, DisplayRotation displayRotation) {
+PaintBuffer::PaintBuffer(uint8_t* buffer, uint16_t displayWidth, uint16_t displayHeight, uint16_t byteWidth) {
   _buffer = buffer;
   _width = displayWidth;
   _height = displayHeight;
   _byteWidth = byteWidth;
   _bitWidth = byteWidth * 8;
   _color = BLACK;
-  _displayRotation = displayRotation;
-  _invertColor = false;
+  _bufferRotation = ROTATE_0;
 }
 
 void PaintBuffer::eraseBuffer(Color color) {
-  if (_invertColor) {
-    color = (color == WHITE) ? BLACK : WHITE;
-  }
   uint8_t fillColor = color == WHITE ? 0xFF : 0x00;
   for (int i = 0; i < _byteWidth * _height; i++) {
     _buffer[i] = fillColor;
@@ -48,17 +43,19 @@ void PaintBuffer::setColor(Color color) {
   _color = color;
 }
 
-void PaintBuffer::setDisplayRotation(DisplayRotation displayRotation) {
-  _displayRotation = displayRotation;
+void PaintBuffer::setBufferRotation(BufferRotation bufferRotation) {
+  _bufferRotation = bufferRotation;
 }
 
 void PaintBuffer::drawAbsolutePixel(uint16_t x, uint16_t y) {
+  drawAbsolutePixel(x, y, _color);
+}
+
+void PaintBuffer::drawAbsolutePixel(uint16_t x, uint16_t y, Color color) {
   if (x < 0 || x >= _width || y < 0 || y >= _height) {
     DebugMsgs.debug().print("drawAbsolutePixel: Invalid pixel, x: ").print(x).print(", y: ").println(y);
     return;
   }
-
-  Color color = _invertColor ? (_color == WHITE ? BLACK : WHITE) : _color;
   
   if (color == WHITE) {
     _buffer[(x + y * _bitWidth) / 8] |= 0x80 >> (x % 8);
@@ -68,50 +65,59 @@ void PaintBuffer::drawAbsolutePixel(uint16_t x, uint16_t y) {
 }
 
 void PaintBuffer::drawPixel(uint16_t x, uint16_t y) {
+  drawPixel(x, y, _color);
+}
+
+void PaintBuffer::drawPixel(uint16_t x, uint16_t y, Color color) {
   int point_temp;
-  switch (_displayRotation) {
+  switch (_bufferRotation) {
     case ROTATE_0: {
       if(x < 0 || x >= _width || y < 0 || y >= _height) {
-          return;
+        DebugMsgs.debug().print("drawPixel ROTATE_0: Invalid pixel, x: ").print(x).print(", y: ").println(y)
+          .print(", x length: ").print(_width).print(", y length: ").println(_height);
+        return;
       }
       
-      drawAbsolutePixel(x, y);
+      drawAbsolutePixel(x, y, color);
     }
     break;
 
     case ROTATE_90: {
       if(x < 0 || x >= _height || y < 0 || y >= _width) {
-        DebugMsgs.debug().print("drawPixel: Invalid pixel, x: ").print(x).print(", y: ").println(y);
+        DebugMsgs.debug().print("drawPixel ROTATE_90: Invalid pixel, x: ").print(x).print(", y: ").print(y)
+          .print(", x length: ").print(_height).print(", y length: ").println(_width);
         return;
       }
       
       point_temp = x;
-      x = _width - y;
+      x = _width - y - 1;
       y = point_temp;
-      drawAbsolutePixel(x, y);
+      drawAbsolutePixel(x, y, color);
     }
     break;
 
     case ROTATE_180: {
       if(x < 0 || x >= _width || y < 0 || y >= _height) {
-        DebugMsgs.debug().print("drawPixel: Invalid pixel, x: ").print(x).print(", y: ").println(y);
+        DebugMsgs.debug().print("drawPixel ROTATE_180: Invalid pixel, x: ").print(x).print(", y: ").println(y)
+          .print(", x length: ").print(_width).print(", y length: ").println(_height);
         return;
       }
-      x = _width - x;
-      y = _height - y;
-      drawAbsolutePixel(x, y);
+      x = _width - x - 1;
+      y = _height - y - 1;
+      drawAbsolutePixel(x, y, color);
     }
     break;
 
     case ROTATE_270: {
       if(x < 0 || x >= _height || y < 0 || y >= _width) {
-        DebugMsgs.debug().print("drawPixel: Invalid pixel, x: ").print(x).print(", y: ").println(y);
+        DebugMsgs.debug().print("drawPixel ROTATE_270: Invalid pixel, x: ").print(x).print(", y: ").println(y)
+          .print(", x length: ").print(_height).print(", y length: ").println(_width);
         return;
       }
       point_temp = x;
       x = y;
-      y = _height - point_temp;
-      drawAbsolutePixel(x, y);
+      y = _height - point_temp - 1;
+      drawAbsolutePixel(x, y, color);
     }
     break;
   }
@@ -247,8 +253,87 @@ void PaintBuffer::drawFilledCircle(uint16_t x, uint16_t y, uint16_t radius) {
   } while(x_pos <= 0);
 }
 
-void PaintBuffer::drawFullImage(const uint8_t* image) {
-  for (int i = 0; i < _byteWidth * _height; i++) {
-    _buffer[i] = image[i];
+void PaintBuffer::drawBitmap(const uint8_t* image, uint16_t x, uint16_t y,
+    uint16_t width, uint16_t height, bool skipUnsetBits) {
+  // This may not be the most efficient code, but it will account for the
+  // display orientation by using drawPixel.
+
+  int i, j;
+
+  for (j = 0; j < height; j++) {
+    for (i = 0; i < width; i++) {
+      uint8_t bitVal = *image & (0x80 >> (i % 8));
+      if (bitVal == 0 && !skipUnsetBits) {
+        drawPixel(x + i, y + j, _color == WHITE ? BLACK : WHITE);
+      } else if (bitVal != 0) {
+        drawPixel(x + i, y + j);
+      }
+      if (i % 8 == 7) {
+        image++;
+      }
+    }
+    if (width % 8 != 0) {
+      image++;
+    }
+  }
+}
+
+void PaintBuffer::drawBitmapFromProgMem(const uint8_t* image, uint16_t x, uint16_t y,
+    uint16_t width, uint16_t height, bool skipUnsetBits) {
+  // This may not be the most efficient code, but it will account for the
+  // display orientation by using drawPixel.
+
+  int i, j;
+  for (j = 0; j < height; j++) {
+    for (i = 0; i < width; i++) {
+      uint8_t bitVal = pgm_read_byte(image) & (0x80 >> (i % 8));
+      if (bitVal == 0 && !skipUnsetBits) {
+        drawPixel(x + i, y + j, _color == WHITE ? BLACK : WHITE);
+      } else if (bitVal != 0) {
+        drawPixel(x + i, y + j);
+      }
+      if (i % 8 == 7) {
+        image++;
+      }
+    }
+    if (width % 8 != 0) {
+      image++;
+    }
+  }
+}
+
+void PaintBuffer::drawStringAt(uint16_t x, uint16_t y, const char* text, sFONT* font,
+    TextJustification textJustification) {
+  const char* p_text = text;
+  int refColumn;
+
+  switch(textJustification) {
+    case CENTER_JUST: {
+      refColumn = x - ((strlen(text) * font->width) / 2);
+    }
+    break;
+
+    case RIGHT_JUST: {
+      refColumn = x - (strlen(text) * font->width);
+    }
+    break;
+
+    default: { // LEFT_JUST
+      refColumn = x;
+    }
+    break;
+  }
+  
+  while (*p_text != 0) {
+    uint32_t char_offset = (*p_text - ' ') * font->height * (font->width / 8 + (font->width % 8 ? 1 : 0));
+    const uint8_t* charPtr = &font->table[char_offset];
+    
+    /* Display one character on EPD */
+    drawBitmap(charPtr, refColumn, y, font->width, font->height);
+
+    /* Decrement the column position by 16 */
+    refColumn += font->width;
+    /* Point on the next character */
+    p_text++;
   }
 }

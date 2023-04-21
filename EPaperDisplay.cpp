@@ -58,11 +58,11 @@ const uint16_t DISPLAY_WIDTH(122);
 const uint16_t DISPLAY_HEIGHT(250);
 
 EPaperDisplay::EPaperDisplay() {
-  _byteWidth = (DISPLAY_WIDTH % 8 == 0)? (DISPLAY_WIDTH / 8 ) : (DISPLAY_WIDTH / 8 + 1);
+  _byteWidth = (DISPLAY_WIDTH % 8 == 0) ? (DISPLAY_WIDTH / 8 ) : (DISPLAY_WIDTH / 8 + 1);
   _displayWidth = DISPLAY_WIDTH;
   _displayHeight = DISPLAY_HEIGHT;
   _imageBuffer = new uint8_t[_byteWidth * _displayHeight];
-  _paintBuffer = new PaintBuffer(_imageBuffer, _displayWidth, _displayHeight, _byteWidth, _displayRotation);
+  _paintBuffer = new PaintBuffer(_imageBuffer, _displayWidth, _displayHeight, _byteWidth);
 }
 
 void EPaperDisplay::start(uint8_t resetPin, uint8_t busyPin, uint8_t dcPin, uint8_t csPin, SPIClass* spi) {
@@ -152,13 +152,6 @@ void EPaperDisplay::setDisplayMode(DisplayMode mode) {
       setWindow(0, 0, _displayWidth - 1, _displayHeight - 1);
       setCursor(0, 0);
     }
-  }
-}
-
-void EPaperDisplay::setDisplayRotation(DisplayRotation displayRotation) {
-  _displayRotation = displayRotation;
-  if (_paintBuffer != 0) {
-    _paintBuffer->setDisplayRotation(displayRotation);
   }
 }
 

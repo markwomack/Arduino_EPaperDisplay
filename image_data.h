@@ -6,8 +6,46 @@
 #ifndef IMAGE_DATA_H
 #define IMAGE_DATA_H
 
-const uint8_t IMAGE_DATA[] = {
-/* 0X00,0X01,0X80,0X00,0XFA,0X00, */
+const uint8_t sample_image1[] = { 0xFF, 0xFF, // width = 16, height = 16
+                                 0x81, 0x81,
+                                 0x81, 0x81,
+                                 0x81, 0x81,
+                                 0x81, 0x81,
+                                 0x81, 0x81,
+                                 0x81, 0x81,
+                                 0x81, 0x81,
+                                 0x81, 0x81,
+                                 0x81, 0x81,
+                                 0x81, 0x81,
+                                 0x81, 0x81,
+                                 0x81, 0x81,
+                                 0x81, 0x81,
+                                 0x81, 0x81,
+                                 0xFF, 0xFF };
+
+const uint8_t sample_image2[] = { 0xFF, 0xFF, 0xFF, // width = 21, height = 21
+                                 0x80, 0x20, 0x0F,
+                                 0x80, 0x20, 0x0F,
+                                 0x80, 0x20, 0x0F,
+                                 0x80, 0x20, 0x0F,
+                                 0x80, 0x20, 0x0F,
+                                 0x80, 0x20, 0x0F,
+                                 0x80, 0x20, 0x0F,
+                                 0x80, 0x20, 0x0F,
+                                 0x80, 0x20, 0x0F,
+                                 0x80, 0x20, 0x0F,
+                                 0x80, 0x20, 0x0F,
+                                 0x80, 0x20, 0x0F,
+                                 0x80, 0x20, 0x0F,
+                                 0x80, 0x20, 0x0F,
+                                 0x80, 0x20, 0x0F,
+                                 0x80, 0x20, 0x0F,
+                                 0x80, 0x20, 0x0F,
+                                 0x80, 0x20, 0x0F,
+                                 0x80, 0x20, 0x0F,
+                                 0xFF, 0xFF, 0xFF };
+                                 
+const uint8_t sample_image3[] PROGMEM = {  // 122 x 250
 0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,
 0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,
 0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,
