@@ -182,7 +182,7 @@ void partialBufferDemo() {
   display.refresh();
   display.refresh();
   display.refresh();
-  display.refresh();
+  display.refresh(); // <-- display will update after this call
   display.sleep();
   delay(2000);
   
@@ -190,7 +190,8 @@ void partialBufferDemo() {
   display.setMode(FULL);
 
   // This will demonstrate it even more clearly
-  paintBuffer->eraseBuffer(WHITE);
+  paintBuffer->eraseBuffer(BLACK);
+  paintBuffer->setColor(WHITE);
   paintBuffer->drawStringAt(
     paintBuffer->getWidth()/2,
     paintBuffer->getHeight()/2 - Font12.height/2,
@@ -198,13 +199,15 @@ void partialBufferDemo() {
   display.refresh();
   
   paintBuffer->eraseBuffer(WHITE);
+  paintBuffer->setColor(BLACK);
   paintBuffer->drawStringAt(
     paintBuffer->getWidth()/2,
     paintBuffer->getHeight()/2 - Font12.height/2,
     "Buffer Refresh 2", &Font12, CENTER_JUST);
   display.refresh();
   
-  paintBuffer->eraseBuffer(WHITE);
+  paintBuffer->eraseBuffer(BLACK);
+  paintBuffer->setColor(WHITE);
   paintBuffer->drawStringAt(
     paintBuffer->getWidth()/2,
     paintBuffer->getHeight()/2 - Font12.height/2,
@@ -212,18 +215,20 @@ void partialBufferDemo() {
   display.refresh();
   
   paintBuffer->eraseBuffer(WHITE);
+  paintBuffer->setColor(BLACK);
   paintBuffer->drawStringAt(
     paintBuffer->getWidth()/2,
     paintBuffer->getHeight()/2 - Font12.height/2,
     "Buffer Refresh 4", &Font12, CENTER_JUST);
   display.refresh();
   
-  paintBuffer->eraseBuffer(WHITE);
+  paintBuffer->eraseBuffer(BLACK);
+  paintBuffer->setColor(WHITE);
   paintBuffer->drawStringAt(
     paintBuffer->getWidth()/2,
     paintBuffer->getHeight()/2 - Font12.height/2,
     "Buffer Refresh 5", &Font12, CENTER_JUST);
-  display.refresh();
+  display.refresh();     // <-- display will update after this call
   display.sleep();
   delay(2000);
   
@@ -232,6 +237,7 @@ void partialBufferDemo() {
 
   // If you rotate the buffer while using a partial
   // buffer, then it doesn't work like you might expect
+  // because everything is drawn in buffer coordinates
   display.stop();
   display.setDisplayOrientation(ROTATE_90);
   paintBuffer = display.start(PARTIAL_BUFFER);
@@ -266,7 +272,7 @@ void partialBufferDemo() {
     paintBuffer->getWidth()/2,
     paintBuffer->getHeight()/2 - Font12.height/2,
     "Buffer Refresh Rotated 90", &Font12, CENTER_JUST);
-  display.refresh();
+  display.refresh();   // <-- display will update after this call
   display.sleep();
   delay(2000);
   
@@ -292,7 +298,7 @@ void partialBufferDemo() {
       display.getDisplayWidth()/2,
       display.getDisplayHeight()/2 - Font12.height/2,
       "Buffer Rotated 0", &Font12, CENTER_JUST);
-    display.refresh();
+    display.refresh();     // <-- display will update fifth time through the loop
   }
   display.sleep();
   delay(2000);
@@ -309,7 +315,7 @@ void partialBufferDemo() {
       display.getDisplayWidth()/2,
       display.getDisplayHeight()/2 - Font12.height/2,
       "Buffer Rotated 90", &Font12, CENTER_JUST);
-    display.refresh();
+    display.refresh();     // <-- display will update fifth time through the loop
   }
   display.sleep();
   delay(2000);
@@ -326,7 +332,7 @@ void partialBufferDemo() {
       display.getDisplayWidth()/2,
       display.getDisplayHeight()/2 - Font12.height/2,
       "Buffer Rotated 180", &Font12, CENTER_JUST);
-    display.refresh();
+    display.refresh();     // <-- display will update fifth time through the loop
   }
   display.sleep();
   delay(2000);
@@ -343,7 +349,7 @@ void partialBufferDemo() {
       display.getDisplayWidth()/2,
       display.getDisplayHeight()/2 - Font12.height/2,
       "Buffer Rotated 270", &Font12, CENTER_JUST);
-    display.refresh();
+    display.refresh();     // <-- display will update fifth time through the loop
   }
   display.sleep();
   delay(2000);
@@ -358,7 +364,7 @@ void partialBufferDemo() {
   for (int x = 0; x < 5; x++) {
     paintBuffer->eraseBuffer();
     paintBuffer->drawBitmapFromProgMem(sample_image3, 0, 0, 121, 249);
-    display.refresh();
+    display.refresh();     // <-- display will update fifth time through the loop
   }
   display.sleep();
   
@@ -368,11 +374,11 @@ void partialBufferDemo() {
 void setup() {
   Serial.begin(9600);
 
-  fullBufferDemo();
+  fullBufferDemo(); // Demonstrates (typical) usage with a full display buffer
   
   delay(5000);
   
-  partialBufferDemo();
+  partialBufferDemo(); // Demonstrates usage with a partial display buffer
 }
 
 void loop() {
