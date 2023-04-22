@@ -60,24 +60,22 @@ By default the display is created with an underlying buffer that is the full siz
 screen (FULL_BUFFER). For a black and white image at 122 x 250 pixels this is 4000 bytes.
 If that is too much for your available runtime memory, you can pass the value
 PARTIAL_BUFFER as a parameter to the start method and a smaller buffer will be created.
-However, this has implications for rendering, which is discussed further in the Demo Code
-section below. Typically you only need to call this method once, at the start of the program,
-using a full size buffer.
-
+However, this has implications for rendering, which is discussed further in the [Demo Code
+section](#demo-code) below. Typically you only need to call this method once, at the start
+of the program, using a full size buffer.
 - **stop** - The stop method is called to stop the display and release all of the memory
 associated with it, this includes the underlying buffer and the associated PaintBuffer
 object. After calling stop, the PaintBuffer instance returned from the call to the start
 method should be discarded (it's already been freed in stop). Typically the stop method
 is never called, but if there is a project that requires it, the display can be restarted
 once again by another call to the start method.
-
 - **setMode** - The setMode method must be called before the refresh method is called. It
 'wakes' the display up from sleep mode and readys the display to receive data.
 - **refresh** - The refresh method is used to render the current contents of the underlying
 buffer to the display. If using a full size buffer (FULL_BUFFER), refresh only
 needs to be called once to render the buffer to the display. If a partial buffer is used,
 then 5 calls to refresh are required to render a full size buffer to the display. This is
-discussed more in the Demo Code section below.
+discussed more in the [Demo Code section](#demo-code) below.
 - **sleep** - After updating the display with the image data, you can call the sleep method
 to place the display into low power sleep mode. In this mode the display will draw a 
 very small amount of current, but the current image on the display will be maintained.
@@ -106,13 +104,11 @@ of the display.
 
 - **eraseBuffer** - Use eraseBuffer to clear the entire buffer to the given color. By default
 this color is WHITE, but you can pass in BLACK as the value to set the entire buffer to black.
-
 - **setColor** - Use the setColor method to set the color that elements will be drawn in. By
 default this color is BLACK, but you can set the color to WHITE if drawing on a black
 background. You can draw in inverse (BLACK background, WHITE drawings), then use the
 eraseBuffer(BLACK) to fill the entire buffer with black, and use setColor(WHITE)
 to change the drawing color, and render your desired objects.
-
 - **getColor** - Returns the current color set in the PaintBuffer.
 - **drawPixel** - Draws a pixel at the given point, in the current color.
 - **drawLine** - Draws a line between two given points, in the current color.
