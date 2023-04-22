@@ -6,9 +6,9 @@ This code is written specifically for this e-Paper display model from Waveshare:
 
 [2.13" Touch e-Paper HAT for Raspberry Pi, 250×122, Black / White, SPI](https://www.waveshare.com/product/displays/e-paper/epaper-3/2.13inch-touch-e-paper-hat.htm)
 
-While this display is meant for usage with a Raspberry Pi, it is still
+While this display is meant for use with a Raspberry Pi, it is still
 compatible with Arduino. And in fact, Waveshare has Arduino example code to drive
-the display (but not the touch screen) is located here:
+the display (but not the touch screen) located here:
 
 [epd2in13_V3](https://github.com/waveshare/e-Paper/tree/master/Arduino/epd2in13_V3)
 
