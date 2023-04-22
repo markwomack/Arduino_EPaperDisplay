@@ -157,4 +157,62 @@ below.
 - **setOffsetStep** - Do not use this method. It is called by the parent EParentDisplay to
 coordinate with the PaintBuffer when refreshing with a partial buffer.
 
+#### Image Basics
+If you are creating your own images to be displayed, please keep in mind some of these basic
+facts. A single image byte represents 8 pixels, one bit for each pixel, with the most significant
+bit being the leftmost pixel. As an example, an image that is 24 pixels wide and 24 pixels in
+height, each row of the image will be 3 bytes wide, and there will be 24 rows. The total number
+of bytes will be 3 x 24 = 72. But what if the width of the image is not a multiple of 8? If we
+have an image that is 21 pixels wide and 21 pixels in height, how many bytes should each row be?
+2 bytes is not enough bits (16 bits) and 3 bytes is more than is needed (24 bits).
+
+In cases where the pixel width is not a multiple of 8, we round up the number of bytes. In this
+case: 3 bytes. The extra bits are just ignored. But they are still accounted for in the memory
+allocated for the image. An image 24 x 24 pixels and an image that is 21 x 24 pixels require the
+same amount of memory, 72 bytes.
+
+The formula to use when determining the 'byte' width of an image is:
+
+```
+if (pixelWidth % 8 == 0) { 
+  byteWidth = pixelWidth / 8;       // pixel width is a multiple of 8
+} else {
+  byteWidth = (pixelWidth / 8) + 1; // pixel width is not a multiple of 8, add a byte for padding
+}
+```
+
 ## Demo Code
+The demo code in the Arduino_EPaperDisplay.ino sketch demonstrates usage for almost all of the
+methods outlined.
+
+### fullBufferDemo
+This method renders a number of screens that are shown in the display when
+the image buffer matches the full size of the display. It demonstrates use of all the shape,
+string, and bitmap methods, using different colors and different display orientations. Normal
+usage will probably not require multiple calls to the start and stop methods, but changing
+orientation in the demo requires it.
+
+### partialBufferDemo
+This method demonstrates the usage of the EPaperDisplay and PaintBuffer
+objects when only a partial buffer is allocated. When PARTIAL_BUFFER is given as a parameter to
+the start method, a buffer that is only 1/5th the size of the full display is allocated. The
+size of the buffer in pixels is only 122 x 50. Using a partial buffer changes the behavior of the
+refresh method. Where the display was updated with just one call to refresh, the display will not
+update until there have been 5 calls to refresh, each call updating a segment of the display. All
+of the updates won't be displayed until the fifth call.
+
+The first two examples show how this works when the display orientation is the default ROTATE_0.
+Each segment is rendered independent of each other, working progressively down the 250 pixel height
+of the display. This might be useful, but not likely. The situation gets even worse when the
+display orientation is changed, as the third example shows. The text is rotation and displayed
+in each segment. The issue is that drawing in the PaintBuffer is being done in the buffer coordinates,
+not the display coordinates.
+
+But in order for the display coordinates to make sense across all 5 buffer segments, you will need
+to call the useOffsetStep. This tells the PaintBuffer to work with the parent EPaperDisplay to count
+the number of refresh calls and to offset the coordinates accordingly. But in order for this to work
+you will need to draw the same buffer contents each of the 5 calls to refresh. It is a lot of
+duplication, but it works perfectly. All of the following examples demonstrate this by drawing the
+same buffer 5 times using display coordinates instead of buffer coordinates. This technique works
+with all display orientations and all of the paint buffer drawing methods. Pixels that would be
+rendered outside of the mapped buffer are ignored.
