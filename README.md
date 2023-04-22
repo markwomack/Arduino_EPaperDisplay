@@ -55,7 +55,8 @@ orientation.
 
 - **start** - The start method is called to initialize the display for usage. It returns a
 PaintBuffer instance, which is used to render pixels, lines, rectangles, circles, fonts,
-and bitmaps into the buffer for the display. More information on that class is below.
+and bitmaps into the buffer for the display. More information on the
+[PaintBuffer class](#paintbuffer) is below.
 By default the display is created with an underlying buffer that is the full size of the
 screen (FULL_BUFFER). For a black and white image at 122 x 250 pixels this is 4000 bytes.
 If that is too much for your available runtime memory, you can pass the value
@@ -148,8 +149,8 @@ is smaller, only 1/5th the size. If the orientation is ROTATE_0 or ROTATE_180, t
 be 50, and if the orientation is ROTATE_90 or ROTATE_270, the width will be 122.
 - **useOffsetStep** - If using a PARTIAL_BUFFER, and you still want the drawing to be rendered
 as if there is a full buffer, then set this value to true (the default is false). You will need
-to draw the full image multiple times, and this is discussed further in the Demo Code section
-below.
+to draw the full image multiple times, and this is discussed further in the
+[Demo Code section](#demo-code) below.
 - **setOffsetStep** - Do not use this method. It is called by the parent EParentDisplay to
 coordinate with the PaintBuffer when refreshing with a partial buffer.
 
@@ -205,10 +206,14 @@ in each segment. The issue is that drawing in the PaintBuffer is being done in t
 not the display coordinates.
 
 But in order for the display coordinates to make sense across all 5 buffer segments, you will need
-to call the useOffsetStep. This tells the PaintBuffer to work with the parent EPaperDisplay to count
-the number of refresh calls and to offset the coordinates accordingly. But in order for this to work
-you will need to draw the same buffer contents each of the 5 calls to refresh. It is a lot of
-duplication, but it works perfectly. All of the following examples demonstrate this by drawing the
-same buffer 5 times using display coordinates instead of buffer coordinates. This technique works
-with all display orientations and all of the paint buffer drawing methods. Pixels that would be
-rendered outside of the mapped buffer are ignored.
+to call the useOffsetStep method. This configures the PaintBuffer to work with the parent
+EPaperDisplay object to count the number of refresh calls and to offset the coordinates accordingly.
+But in order for this to work you will need to draw the same buffer contents each of the 5 calls to
+refresh. It is a lot of duplication, but it works perfectly. All of the following examples demonstrate
+this by drawing the same buffer 5 times using display coordinates instead of buffer coordinates. This
+technique works with all display orientations and all of the paint buffer drawing methods. Pixels that
+would be rendered outside of the mapped buffer are ignored so that memory is not corrupted.
+
+## Questions, Concerns, Bugs
+If you have any questions or encounter bugs, [please report a new issue](https://github.com/markwomack/Arduino_EPaperDisplay/issues).
+Please provide as much detail and sample code that you can.
