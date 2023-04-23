@@ -13,7 +13,7 @@ the display (but not the touch screen) located here:
 [epd2in13_V3](https://github.com/waveshare/e-Paper/tree/master/Arduino/epd2in13_V3)
 
 I started with that Waveshare code to create my code. Much of the structure
-and code is the same, just cleaned up with some better class organization and some added
+and code is the same, just cleaned up with better class organization and added
 features. I don't have any documentation about the SPI commands, so I have just copied
 them over as-is. I will add more comments and documentation as I learn more.
 
