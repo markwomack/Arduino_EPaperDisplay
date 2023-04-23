@@ -89,7 +89,7 @@ class EPaperDisplay {
     void spiTransfer(uint8_t data);
 
     // Not sure what these do yet.
-    void setWindow(uint8_t xStart, uint8_t yStart, uint8_t xEnd, uint8_t yEnd);
-    void setCursor(uint8_t xStart, uint8_t yStart);
+    void setWindow(uint16_t xStart, uint16_t yStart, uint16_t xEnd, uint16_t yEnd);
+    void setCursor(uint16_t xStart, uint16_t yStart);
 };
 #endif // EPAPERDISPLAY_H

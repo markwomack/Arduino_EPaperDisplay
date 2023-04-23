@@ -4,20 +4,88 @@
 //
 
 #include <Arduino.h>
+#include <Wire.h>
+
+#include <DebugMsgs.h>
+#include <TaskManager.h>
 
 #include "pin_assignments.h"
 #include "EPaperDisplay.h"
 #include "PaintBuffer.h"
+#include "Touchscreen.h"
 
 #include "src/image_data.h"
+
+void fullBufferDemo();
+void partialBufferDemo();
+
+class TouchscreenStateTask : public Task {
+  public:
+    TouchscreenStateTask(Touchscreen* touchScreen) {
+      _touchscreen = touchScreen;
+    }
+
+    void update(void) {
+      if (_touchscreen->getState(&_touchscreenState)) {
+        DebugMsgs.debug().println("New state:");
+        for (int i = 0; i < _touchscreenState.count; i++) {
+          DebugMsgs.debug()
+            .print("trackId: ").print(_touchscreenState.trackId[i])
+            .print("x: ").print(_touchscreenState.x[i])
+            .print(", y: ").print(_touchscreenState.y[i])
+            .print(", size: ").println(_touchscreenState.size[i]);
+        }
+      }
+    };
+
+  private:
+  Touchscreen* _touchscreen;
+  TouchscreenState _touchscreenState;
+};
+
+EPaperDisplay display;
+Touchscreen touchscreen;
+TouchscreenStateTask touchscreenStateTask(&touchscreen);
+
+void setup() {
+  Serial.begin(9600);
+
+  while (!Serial) {;}
+  
+  DebugMsgs.enableLevel(DEBUG);
+
+//  fullBufferDemo(); // Demonstrates (typical) usage with a full display buffer
+//  
+//  delay(5000);
+//  
+//  partialBufferDemo(); // Demonstrates usage with a partial display buffer
+
+  Wire.setClock(400000);  // fast mode
+  Wire.begin();
+
+  display.setPinsAndSPI(RESET_PIN, BUSY_PIN, DC_PIN, SPI_CS_PIN, &SPI);
+  display.start();
+  display.setMode(FULL);
+
+  touchscreen.setPinsAndI2C(TS_RESET_PIN, TS_INTERRUPT_PIN, &Wire);
+  touchscreen.start();
+  touchscreen.getVersion();
+  
+  taskManager.addBlinkTask(LED_STATUS_PIN, 500);
+  taskManager.addTask(&touchscreenStateTask, 100);
+  taskManager.start();
+}
+
+void loop() {
+  taskManager.update();
+}
 
 // This method demonstrates the use of the display with a full
 // buffer that matches the size of the display. This is the
 // typical usage unless you have very limited memory available.
 void fullBufferDemo() {
-  EPaperDisplay display;
 
-  display.setPinsAndSPI(RESET_PIN, BUSY_PIN, DC_PIN, SPI_CS0_PIN, &SPI);
+  display.stop();
   display.setDisplayOrientation(ROTATE_90);
   PaintBuffer* paintBuffer = display.start();
   display.setMode(FULL);
@@ -164,9 +232,7 @@ void fullBufferDemo() {
 // memory is small.
 void partialBufferDemo() {
 
-  EPaperDisplay display;
-
-  display.setPinsAndSPI(RESET_PIN, BUSY_PIN, DC_PIN, SPI_CS0_PIN, &SPI);
+  display.stop();
   display.setDisplayOrientation(ROTATE_0);
   PaintBuffer* paintBuffer = display.start(PARTIAL_BUFFER);
   display.setMode(FULL);
@@ -369,18 +435,4 @@ void partialBufferDemo() {
   display.sleep();
   
   display.stop();
-}
-
-void setup() {
-  Serial.begin(9600);
-
-  fullBufferDemo(); // Demonstrates (typical) usage with a full display buffer
-  
-  delay(5000);
-  
-  partialBufferDemo(); // Demonstrates usage with a partial display buffer
-}
-
-void loop() {
-  // These aren't the droids we are looking for, move along.
 }

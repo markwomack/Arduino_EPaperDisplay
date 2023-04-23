@@ -181,7 +181,7 @@ void EPaperDisplay::setMode(Mode mode) {
   }
 }
 
-void EPaperDisplay::setWindow(uint8_t xStart, uint8_t yStart, uint8_t xEnd, uint8_t yEnd)
+void EPaperDisplay::setWindow(uint16_t xStart, uint16_t yStart, uint16_t xEnd, uint16_t yEnd)
 {
   sendCommand(0x44); // SET_RAM_X_ADDRESS_START_END_POSITION
   sendData((xStart >> 3) & 0xFF);
@@ -194,7 +194,7 @@ void EPaperDisplay::setWindow(uint8_t xStart, uint8_t yStart, uint8_t xEnd, uint
   sendData((yEnd >> 8) & 0xFF);
 }
 
-void EPaperDisplay::setCursor(uint8_t xStart, uint8_t yStart) {
+void EPaperDisplay::setCursor(uint16_t xStart, uint16_t yStart) {
   sendCommand(0x4E); // SET_RAM_X_ADDRESS_COUNTER
   sendData(xStart & 0xFF);
 
